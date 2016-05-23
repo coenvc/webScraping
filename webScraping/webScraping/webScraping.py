@@ -6,13 +6,14 @@ import time
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from peewee import *
+from peewee import * 
 import datetime
 import decimal
 from itertools import izip
-import lxml.html
+import lxml.html 
+import pymysql
 from selenium.common.exceptions import NoSuchElementException
-from pprint import pprint
+from pprint import pprint 
 links = ["http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=163","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=267"
          ,"http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=268","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=114",
          "http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=255"
@@ -26,7 +27,7 @@ linkCount = 0
 link = links[linkCount]
 browser = webdriver.PhantomJS('D:/Downloads/phantomjs-2.1.1-windows/phantomjs-2.1.1-windows/bin/phantomjs.exe')
 sleep = time.sleep
-db = pw.MySQLDatabase("mydb", host="mydb.crhauek3cxfw.us-west-2.rds.amazonaws.com", port=3306, user="user", passwd="password")
+db = MySQLDatabase("pebble",host="146.185.174.154", port=3306, user="root", passwd="Denia123")
 gegevens = []
 dictionary = {}
 class Site(object):
@@ -99,20 +100,13 @@ def add_site():
     for items in gegevens:
         serial= gegevens[i]['Serienummer']
         power =  gegevens[i]["Energie"]
-        try:
-            user.create( serial = serial, power = power)
-            i += 1
-            
+        user.create( serial = serial, power = power)
+        i += 1
+        
 
-        except IntegrityError:
-            user_record = user.get(serial = serial )
-            user_record.power = power
-            user_record.save()
-            uData_record = uData.get(serial = serial)
-            uData_record.SiteNaam = SiteNaam
-            uData_record.Naam = Naam
+        
 
-if __name__ == '__main__':
-    db.connect()
+if __name__ == '__main__': 
+    db.connect() 
     db.create_tables([user,uData], safe = True)
     add_site()
