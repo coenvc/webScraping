@@ -16,12 +16,14 @@ from selenium.common.exceptions import NoSuchElementException
 from pprint import pprint
 import socket
 current_milli_time = lambda: int(round(time.time() * 1000))
+from selenium.common.exceptions import NoSuchElementException
+from pprint import pprint
 links = ["http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=163","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=267"
          ,"http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=268","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=114",
          "http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=255"
          ]
 
-newCon = socket.socket(_sock=newCon)
+
 
 accountInfo = [{'username': "vogelzichtpebble@gmail.com", 'password' : "Pebble01",'siteName':"vogelzicht"},
                {'username': "torenzichtpebble@gmail.com", 'password' : "Pebble01",'siteName': "TorenZicht"},
@@ -31,7 +33,7 @@ linkCount = 0
 link = links[linkCount]
 browser = webdriver.PhantomJS('D:/Downloads/phantomjs-2.1.1-windows/phantomjs-2.1.1-windows/bin/phantomjs.exe')
 sleep = time.sleep
-db = MySQLDatabase("pebble",host="146.185.174.154", port=3306, user="root", passwd="Denia123")
+db = MySQLDatabase("pebble", host="82.196.10.191", port=3306, user="root", passwd="Denia123")
 gegevens = []
 dictionary = {}
 class Site(object):
@@ -83,7 +85,7 @@ for account in accountInfo:
     site.getTable(i, count);
     i += 1
 
-class user(Model):
+class Data(Model):
         serial = CharField(max_length = 100)
         power = FloatField(default = 0)
         #username = CharField(max_length = 100)
@@ -94,7 +96,9 @@ class user(Model):
 class uData(Model):
         Naam = CharField(max_length = 100)
         Serial = CharField(max_length = 100, primary_key = True)
-        SiteNaam  = CharField(max_length = 100)
+        SiteNaam  = CharField(max_length = 100) 
+        class Meta: 
+            database = db
 
 
 
@@ -104,19 +108,37 @@ def add_site():
         for items in gegevens:
             serial= gegevens[i]['Serienummer']
             power =  gegevens[i]["Energie"]
-            user.create( serial = serial, power = power)
+            Data.create( serial = serial, power = power) 
             i += 1
     except IntegrityError:
         for items in gegevens:
             created_date_record = datetime.datetime.now();
             serial_record = serial;
             power_record = power;
-            user.create( serial = serial_record, power = power_record)
+            Data.create( serial = serial_record, power = power_record)
+            uData_record = uData.get(serial = serial)
+            uData_record.SiteNaam = SiteNaam
+            uData_record.Naam = Naam
         i += 1
 
 
+    #for items in gegevens:
+    #    serial= gegevens[i]['Serienummer']
+    #    power =  gegevens[i]["Energie"]
+    #    try:
+    #        user.create( serial = serial, power = power)
+    #        i += 1
+            
+
+    #    except IntegrityError:
+    #        user_record = user.get(serial = serial )
+    #        user_record.power = power
+    #        user_record.save()
+    #        uData_record = uData.get(serial = serial)
+    #        uData_record.SiteNaam = SiteNaam
+    #        uData_record.Naam = Naam
 
 if __name__ == '__main__':
     db.connect()
-    db.create_tables([user,uData], safe = True)
+    db.create_tables([Data,uData], safe = True)
     add_site()
