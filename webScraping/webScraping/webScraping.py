@@ -14,6 +14,7 @@ import lxml.html
 import pymysql
 from selenium.common.exceptions import NoSuchElementException
 from pprint import pprint
+current_milli_time = lambda: int(round(time.time() * 1000))
 links = ["http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=163","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=267"
          ,"http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=268","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=114",
          "http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=255"
@@ -83,29 +84,32 @@ class user(Model):
         serial = CharField(max_length = 100)
         power = FloatField(default = 0)
         #username = CharField(max_length = 100)
-        created_date = DateTimeField(default=datetime.datetime.now, primary_key = True)
+        #created_date = DateTimeField(default = datetime.datetime.now());
+        id = IntegerField(primary_key = True)
         class Meta:
             database = db
 
 class uData(Model):
         Naam = CharField(max_length = 100)
-        Serial = CharField(max_length = 100, primary_key = True)
+        Serial = CharField(max_length = 100)
         SiteNaam  = CharField(max_length = 100)
-        class Meta:
-            indexes = (
-                (('Naam','Serial','SiteNaam'))
-            )
-            database = db
+
 
 
 def add_site():
     i = 0
-    for items in gegevens:
-        serial= gegevens[i]['Serienummer']
-        power =  gegevens[i]["Energie"]
-        user.create( serial = serial, power = power)
+    try:
+        for items in gegevens:
+            serial= gegevens[i]['Serienummer']
+            power =  gegevens[i]["Energie"]
+            user.create( serial = serial, power = power)
+            i += 1
+    except IntegrityError:
+        for items in gegevens:
+            serial_record = serial
+            power_record = power
+            user.create( serial = serial_record)
         i += 1
-
 
 
 
