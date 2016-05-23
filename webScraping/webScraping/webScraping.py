@@ -14,11 +14,14 @@ import lxml.html
 import pymysql
 from selenium.common.exceptions import NoSuchElementException
 from pprint import pprint
+import socket
 current_milli_time = lambda: int(round(time.time() * 1000))
 links = ["http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=163","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=267"
          ,"http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=268","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=114",
          "http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=255"
          ]
+
+newCon = socket.socket(_sock=newCon)
 
 accountInfo = [{'username': "vogelzichtpebble@gmail.com", 'password' : "Pebble01",'siteName':"vogelzicht"},
                {'username': "torenzichtpebble@gmail.com", 'password' : "Pebble01",'siteName': "TorenZicht"},
@@ -84,14 +87,13 @@ class user(Model):
         serial = CharField(max_length = 100)
         power = FloatField(default = 0)
         #username = CharField(max_length = 100)
-        #created_date = DateTimeField(default = datetime.datetime.now());
-        id = IntegerField(primary_key = True)
+        created_date = DateTimeField(default = datetime.datetime.now());
         class Meta:
             database = db
 
 class uData(Model):
         Naam = CharField(max_length = 100)
-        Serial = CharField(max_length = 100)
+        Serial = CharField(max_length = 100, primary_key = True)
         SiteNaam  = CharField(max_length = 100)
 
 
@@ -106,9 +108,10 @@ def add_site():
             i += 1
     except IntegrityError:
         for items in gegevens:
-            serial_record = serial
-            power_record = power
-            user.create( serial = serial_record)
+            created_date_record = datetime.datetime.now();
+            serial_record = serial;
+            power_record = power;
+            user.create( serial = serial_record, power = power_record)
         i += 1
 
 
