@@ -6,14 +6,14 @@ import time
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from peewee import * 
+from peewee import *
 import datetime
 import decimal
 from itertools import izip
-import lxml.html 
+import lxml.html
 import pymysql
 from selenium.common.exceptions import NoSuchElementException
-from pprint import pprint 
+from pprint import pprint
 links = ["http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=163","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=267"
          ,"http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=268","http://www.solarmanpv.com/portal/Terminal/TerminalMain.aspx?pid=114",
          "http://www.solarmanpv.com/portal/terminal/TerminalMain.aspx?come=Public&pid=255"
@@ -89,9 +89,12 @@ class user(Model):
 
 class uData(Model):
         Naam = CharField(max_length = 100)
-        serial = CharField(max_length = 100, primary_key = True)
+        Serial = CharField(max_length = 100, primary_key = True)
         SiteNaam  = CharField(max_length = 100)
         class Meta:
+            indexes = (
+                (('Naam','Serial','SiteNaam'))
+            )
             database = db
 
 
@@ -102,11 +105,11 @@ def add_site():
         power =  gegevens[i]["Energie"]
         user.create( serial = serial, power = power)
         i += 1
-        
 
-        
 
-if __name__ == '__main__': 
-    db.connect() 
+
+
+if __name__ == '__main__':
+    db.connect()
     db.create_tables([user,uData], safe = True)
     add_site()
